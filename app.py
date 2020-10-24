@@ -23,7 +23,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-migrate = Migrate(app, db) # this
+migrate = Migrate(app, db)
 # TODO (completed): connect to a local postgresql database
 
 #----------------------------------------------------------------------------#
@@ -121,6 +121,9 @@ def venues():
   #     "num_upcoming_shows": 0,
   #   }]
   # }]
+  
+  # data = pull from postgresql database
+
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
@@ -232,7 +235,7 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
+  # TODO (completed): insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
   try:
@@ -510,6 +513,33 @@ def create_shows():
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
+
+  try:
+    new_artist = Artist(
+      name = request.form['name'],
+      city = request.form['city'],
+      state = request.form['state'],
+      address = request.form['address'],
+      phone = request.form['name'],
+      genres= request.form.getlist('genres'),
+      image_link = request.form['image_link'],
+      facebook_link = request.form['facebook_link'],
+    )
+    print(request.form['genres'], file=sys.stdout)
+    print('Hello world!', file=sys.stderr)
+    db.session.add(new_artist)
+    db.session.commit()
+    # on successful db insert, flash success
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  except:
+    print(sys.exc_info())
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+  # TODO: on unsuccessful db insert, flash an error instead.
+  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  return render_template('pages/home.html')
+
+
 
   # on successful db insert, flash success
   flash('Show was successfully listed!')
