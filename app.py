@@ -324,6 +324,11 @@ def artists():
   for artist in artists:
     print(artist.id)
     print(artist.name)
+    data.append({
+        "id": artist.id,
+        "name": artist.name
+      })
+
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
