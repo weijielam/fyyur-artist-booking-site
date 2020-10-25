@@ -66,8 +66,8 @@ class Show(db.Model):
     __tablename__ = 'Show'
 
     id = db.Column(db.Integer, primary_key=True)
-    venue_id = db.Column(db.Integer)
-    artist_id = db.Column(db.Integer)
+    venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
     description = db.Column(db.String(120))
     
 #----------------------------------------------------------------------------#
@@ -131,7 +131,7 @@ def venues():
 
   for venue in venues:
     print(venue_city_and_state)
-    print(venue.city + venue.state)
+    print(venue)
     upcoming_shows = []
     if venue_city_and_state == venue.city + venue.state:
       data[len(data) - 1]["venues"].append({
