@@ -130,12 +130,18 @@ def venues():
   print(venues)
 
   for venue in venues:
+    print(venue_city_and_state)
+    print(venue.city + venue.state)
     upcoming_shows = []
     if venue_city_and_state == venue.city + venue.state:
-      data[len(data) - 1]["venues"].append
+      data[len(data) - 1]["venues"].append({
+        "id": venue.id,
+        "name": venue.name,
+        "num_upcoming_shows": 1
+      })
       print('match')
     else:
-      venue_city_and_state == venue.city + venue.state
+      venue_city_and_state = venue.city + venue.state
       data.append({
         "city": venue.city,
         "state": venue.state,
@@ -145,12 +151,6 @@ def venues():
           "num_upcoming_shows": 1
         }]
       })
-    print(venue)
-    print(venue.id)
-    print(venue.name)
-    print(venue.state)
-    print(venue.city)
-    print(data)
 
   return render_template('pages/venues.html', areas=data);
 
