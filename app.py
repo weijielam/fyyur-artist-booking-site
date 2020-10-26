@@ -583,21 +583,18 @@ def create_show_submission():
   # TODO: insert form data as a new Show record in the db, instead
 
   try:
-    new_artist = Artist(
-      name = request.form['name'],
-      city = request.form['city'],
-      state = request.form['state'],
-      address = request.form['address'],
-      phone = request.form['name'],
-      genres= request.form.getlist('genres'),
-      image_link = request.form['image_link'],
-      facebook_link = request.form['facebook_link'],
+    new_show = Show(
+      artist_id = request.form['artist_id'],
+      venue_id = request.form['venue_id'],
+      description = "placeholder"
     )
 
-    db.session.add(new_artist)
+    db.session.add(new_show)
     db.session.commit()
     # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    # flash('Show ' + request.form['artist'] + ' was successfully listed!')
+    flash('Show ' + new_show.description + ' was successfully listed!')
+
   except:
     print(sys.exc_info())
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
