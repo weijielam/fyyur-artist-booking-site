@@ -57,7 +57,7 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column("genres", db.ARRAY(db.String()), nullable=False)
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
@@ -133,12 +133,8 @@ def venues():
   data = []
   venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
   venue_city_and_state = ''
-  
-  print(venues)
 
   for venue in venues:
-    print(venue_city_and_state)
-    print(venue)
     upcoming_shows = []
     if venue_city_and_state == venue.city + venue.state:
       data[len(data) - 1]["venues"].append({
@@ -262,8 +258,9 @@ def show_venue(venue_id):
   venue_query = Venue.query.get(venue_id)
   if venue_query:
     data = venue_query
+    print(data.genres)
     return render_template('pages/show_venue.html', venue=data)
-    
+
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -290,8 +287,6 @@ def create_venue_submission():
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
     )
-    print(request.form['genres'], file=sys.stdout)
-    print('Hello world!', file=sys.stderr)
     db.session.add(new_venue)
     db.session.commit()
     # on successful db insert, flash success
@@ -331,11 +326,8 @@ def artists():
 
   data = []
   artists = Artist.query.all() 
-  print(artists)
 
   for artist in artists:
-    print(artist.id)
-    print(artist.name)
     data.append({
         "id": artist.id,
         "name": artist.name
@@ -433,7 +425,14 @@ def show_artist(artist_id):
   #   "past_shows_count": 0,
   #   "upcoming_shows_count": 3,
   # }
-  data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
+
+  # data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
+  artist_query = Artist.query.get(artist_id)
+  if artist_query:
+    data = artist_query
+    print(type(data.genres))
+    print(data.genres)
+    return render_template('pages/show_artist.html', artist=data)
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
@@ -513,7 +512,6 @@ def create_artist_submission():
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
     )
-    print(new_artist)
     db.session.add(new_artist)
     db.session.commit()
     # on successful db insert, flash success
@@ -595,8 +593,7 @@ def create_show_submission():
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
     )
-    print(request.form['genres'], file=sys.stdout)
-    print('Hello world!', file=sys.stderr)
+
     db.session.add(new_artist)
     db.session.commit()
     # on successful db insert, flash success
