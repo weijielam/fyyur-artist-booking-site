@@ -569,6 +569,14 @@ def shows():
   #   "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
   #   "start_time": "2035-04-15T20:00:00.000Z"
   # }]
+  shows_query = db.session.query(Show).join(Artist).join(Venue).all()
+
+  data = []
+  for show in shows_query: 
+    print(show.id)
+    print(show.artist_id)
+    print(show.venue_id)
+
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
