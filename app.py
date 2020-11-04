@@ -75,6 +75,7 @@ class Show(db.Model):
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
     description = db.Column(db.String(120))
+    start_time = db.Column(db.DateTime)
     
 #----------------------------------------------------------------------------#
 # Filters.
@@ -576,6 +577,14 @@ def shows():
     print(show.id)
     print(show.artist_id)
     print(show.venue_id)
+    artist = Artist.query.get(show.artist_id)
+    print(artist.name)
+    data.append({
+      "artist_name": artist.name,
+      "artist_id": show.artist_id,
+      "venue_id": show.venue_id,
+      "start_time": "2020"
+    })
 
   return render_template('pages/shows.html', shows=data)
 
