@@ -330,7 +330,7 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # TODO: replace with real data returned from querying the database
+  # TODO (completed): replace with real data returned from querying the database
   # data=[{
   #   "id": 4,
   #   "name": "Guns N Petals",
@@ -358,14 +358,14 @@ def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
-  }
+  # response={
+  #   "count": 1,
+  #   "data": [{
+  #     "id": 4,
+  #     "name": "Guns N Petals",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }
 
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Artist).filter(Artist.name.ilike(f'%{search_term}%')).all()
