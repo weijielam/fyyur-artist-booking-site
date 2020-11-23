@@ -105,55 +105,27 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  # NOTE: Need to implement num_shows feature
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  # data=[{
-  #   "city": "San Francisco",
-  #   "state": "CA",
-  #   "venues": [{
-  #     "id": 1,
-  #     "name": "The Musical Hop",
-  #     "num_upcoming_shows": 0,
-  #   }, {
-  #     "id": 3,
-  #     "name": "Park Square Live Music & Coffee",
-  #     "num_upcoming_shows": 1,
-  #   }]
-  # }, {
-  #   "city": "New York",
-  #   "state": "NY",
-  #   "venues": [{
-  #     "id": 2,
-  #     "name": "The Dueling Pianos Bar",
-  #     "num_upcoming_shows": 0,
-  #   }]
-  # }]
-  
-  # data = pull from postgresql database
+  # TODO (more or less complete): replace with real venues data.
   data = []
   venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
   venue_city_and_state = ''
 
   for venue in venues:
-    upcoming_shows = []
+    num_upcoming_shows = 0
     current_date = datetime.now()
     print(venue.id)
   
     shows = Show.query.filter_by(venue_id=venue.id).all()
     for show in shows:
       if show.start_time > current_date:
-        print("another show")
-      else:
-        print("nah")
+        num_upcoming_shows += 1
     
     if venue_city_and_state == venue.city + venue.state:
       data[len(data) - 1]["venues"].append({
         "id": venue.id,
         "name": venue.name,
-        "num_upcoming_shows": 1
+        "num_upcoming_shows": num_upcoming_shows
       })
-      print('match')
     else:
       venue_city_and_state = venue.city + venue.state
       data.append({
@@ -162,7 +134,7 @@ def venues():
         "venues": [{
           "id": venue.id,
           "name": venue.name,
-          "num_upcoming_shows": 1
+          "num_upcoming_shows": num_upcoming_shows
         }]
       })
 
