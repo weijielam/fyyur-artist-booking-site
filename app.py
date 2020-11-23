@@ -138,11 +138,14 @@ def venues():
   for venue in venues:
     upcoming_shows = []
     current_date = datetime.now()
+    print(venue.id)
   
-    shows = Show.query.filter_by(venue_id)
+    shows = Show.query.filter_by(venue_id=venue.id).all()
     for show in shows:
       if show.start_time > current_date:
         print("another show")
+      else:
+        print("nah")
     
     if venue_city_and_state == venue.city + venue.state:
       data[len(data) - 1]["venues"].append({
@@ -624,7 +627,7 @@ def shows():
       "artist_name": artist.name,
       "artist_id": show.artist_id,
       "venue_id": show.venue_id,
-      "start_time": "2020"
+      "start_time": format_datetime(str(show.start_time))
     })
 
   return render_template('pages/shows.html', shows=data)
@@ -644,7 +647,8 @@ def create_show_submission():
     new_show = Show(
       artist_id = request.form['artist_id'],
       venue_id = request.form['venue_id'],
-      description = "placeholder"
+      description = "placeholder",
+      start_time = request.form['start_time']
     )
 
     db.session.add(new_show)
