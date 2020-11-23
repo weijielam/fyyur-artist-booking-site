@@ -13,7 +13,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
-import datetime
+from datetime import datetime
 import sys
 #----------------------------------------------------------------------------#
 # App Config.
@@ -75,7 +75,7 @@ class Show(db.Model):
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
     description = db.Column(db.String(120))
-    start_time = db.Column(db.DateTime)
+    start_time = db.Column(db.DateTime, nullable=False, default=datetime.now())
     
 #----------------------------------------------------------------------------#
 # Filters.
@@ -137,6 +137,13 @@ def venues():
 
   for venue in venues:
     upcoming_shows = []
+    current_date = datetime.now()
+  
+    shows = Show.query.filter_by(venue_id)
+    for show in shows:
+      if show.start_time > current_date:
+        print("another show")
+    
     if venue_city_and_state == venue.city + venue.state:
       data[len(data) - 1]["venues"].append({
         "id": venue.id,
