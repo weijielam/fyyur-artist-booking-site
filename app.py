@@ -656,6 +656,17 @@ def create_show_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
+def num_upcoming_shows(venue_id):
+  num_upcoming_shows = 0
+  current_date = datetime.now()
+  
+  shows = Show.query.filter_by(venue_id=venue_id).all()
+  for show in shows:
+    if show.start_time > current_date:
+      num_upcoming_shows += 1
+
+  return num_upcoming_shows
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
