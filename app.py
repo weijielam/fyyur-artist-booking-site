@@ -143,16 +143,7 @@ def venues():
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   # TODO (completed): implement search on artists with partial string search. Ensure it is case-insensitive.
-  # seach for Hop should return "The Musical Hop".
-  # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  # response={
-  #   "count": 1,
-  #   "data": [{
-  #     "id": 2,
-  #     "name": "The Dueling Pianos Bar",
-  #     "num_upcoming_shows": 0,
-  #   }]
-  # }
+
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
   current_date = datetime.now()
@@ -266,7 +257,7 @@ def show_venue(venue_id):
   venue_query = Venue.query.get(venue_id)
   if venue_query:
     data = venue_query
-    print(data.genres)
+    print(data)
     return render_template('pages/show_venue.html', venue=data)
 
   return render_template('pages/show_venue.html', venue=data)
@@ -321,17 +312,6 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO (completed): replace with real data returned from querying the database
-  # data=[{
-  #   "id": 4,
-  #   "name": "Guns N Petals",
-  # }, {
-  #   "id": 5,
-  #   "name": "Matt Quevedo",
-  # }, {
-  #   "id": 6,
-  #   "name": "The Wild Sax Band",
-  # }]
-
   data = []
   artists = Artist.query.all() 
 
@@ -340,7 +320,6 @@ def artists():
         "id": artist.id,
         "name": artist.name
       })
-
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
@@ -655,17 +634,6 @@ def create_show_submission():
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
-
-def num_upcoming_shows(venue_id):
-  num_upcoming_shows = 0
-  current_date = datetime.now()
-  
-  shows = Show.query.filter_by(venue_id=venue_id).all()
-  for show in shows:
-    if show.start_time > current_date:
-      num_upcoming_shows += 1
-
-  return num_upcoming_shows
 
 @app.errorhandler(404)
 def not_found_error(error):
