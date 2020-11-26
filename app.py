@@ -155,13 +155,21 @@ def search_venues():
   # }
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
+  current_date = datetime.now()
+  num_upcoming_shows = 0
   data = []
 
   for result in search_result:
+    shows = Show.query.filter_by(venue_id=result.id).all()
+    
+    for show in shows:
+      if show.start_time > current_date:
+        num_upcoming_shows += 1
+    
     data.append({
       "id": result.id,
       "name": result.name,
-      "num_upcoming_shows": 1
+      "num_upcoming_shows": num_upcoming_shows
     })
   
   response={
