@@ -24,7 +24,6 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-# TODO (completed): connect to a local postgresql database
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -47,8 +46,6 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(250))
     shows = db.relationship('Show', backref='venue', lazy=True)
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -66,9 +63,6 @@ class Artist(db.Model):
 
     shows = db.relationship('Show', backref='artist', lazy=True)
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
     __tablename__ = 'Show'
 
@@ -106,7 +100,6 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO (complete): replace with real venues data.
   data = []
   venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
   venue_city_and_state = ''
@@ -143,8 +136,6 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  # TODO (completed): implement search on artists with partial string search. Ensure it is case-insensitive.
-
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
   current_date = datetime.now()
@@ -173,10 +164,6 @@ def search_venues():
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
-  # TODO: get upcoming and past shows for each venue
-
   venue = Venue.query.get(venue_id)
   shows = Show.query.filter_by(venue_id=venue.id).all()
   past_shows = []
@@ -226,9 +213,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO (completed): insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
   try:
     new_venue = Venue(
       name = request.form['name'],
@@ -242,14 +226,13 @@ def create_venue_submission():
     )
     db.session.add(new_venue)
     db.session.commit()
-    # on successful db insert, flash success
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   except:
-    print(sys.exc_info())
+    db.session.rollback()
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  finally:
+    db.session.close()
+  
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -277,8 +260,6 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-  # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
-  # TODO: implement num_upcoming_shows
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Artist).filter(Artist.name.ilike(f'%{search_term}%')).all()
   data = []
