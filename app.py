@@ -237,7 +237,21 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
+  try:
+    venue = Venue.query.get(venue_id)
+    venue_name = venue.name
+
+    db.session.delete(venue)
+    db.session.commit()
+
+    flash('Venue' + venue_name + ' was deleted')
+  
+  except:
+    flash('An error occured and Venue ' + venue_name + ' was not deleted')
+    db.session.rollback()
+  
+  finally:
+    db.session.close()
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
@@ -316,15 +330,10 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
   try:
     form = ArtistForm()
 
     artist = Artist.query.get(artist_id)
-
-    artist.name = form.name.data
-
     artist.name = form.name.data
     artist.phone = form.phone.data
     artist.state = form.state.data
@@ -368,8 +377,30 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
+  try:
+    form = VenueForm()
+    venue = Venue.query.get(venue_id)
+    name = form.name.data
+
+    venue.name = name
+    venue.genres = form.genres.data
+    venue.city = form.city.data
+    venue.state = form.state.data
+    venue.address = form.address.data
+    venue.phone = form.phone.data
+    venue.facebook_link = form.facebook_link.data
+    venue.website = form.website.data
+    venue.image_link = form.image_link.data
+    venue.seeking_talent = form.seeking_talent.data
+    venue.seeking_description = form.seeking_description.data
+
+    db.session.commit()
+    flash('Venue ' + name + ' has been updated')
+  except:
+    db.session.rollback()
+    flash('An error occured while trying to update Venue')
+  finally:
+    db.session.close()
   return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
@@ -382,7 +413,6 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-
   try:
     new_artist = Artist(
       name = request.form['name'],
@@ -393,25 +423,30 @@ def create_artist_submission():
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
     )
+
     db.session.add(new_artist)
     db.session.commit()
-    # on successful db insert, flash success
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  
   except:
-    print(sys.exc_info())
+    db.session.rollback()
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+
+  finally:
+    db.session.close()
+  
   return render_template('pages/home.html')
 
-
+@app.route('/artist/delete/<artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+  print('placeholder')
+  # add code here
+  
 #  Shows
 #  ----------------------------------------------------------------
 
 @app.route('/shows')
 def shows():
-
   shows = db.session.query(Show).join(Artist).join(Venue).all()
   data = []
 
