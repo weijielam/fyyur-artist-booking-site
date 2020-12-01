@@ -200,7 +200,7 @@ def show_venue(venue_id):
     "past_shows_count": len(past_shows),
     "upcoming_shows_count": len(upcoming_shows)
   }
-
+  
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -297,11 +297,40 @@ def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
 
-  artist_query = Artist.query.get(artist_id)
-  if artist_query:
-    data = artist_query
-    return render_template('pages/show_artist.html', artist=data)
+  artist = Artist.query.get(artist_id)
+  upcoming_shows = []
+  past_shows = []
+  current_time = datetime.now()
 
+  shows = Show.query.filter_by(artist_id=artist.id).all()
+
+  for show in shows:
+    data = {
+      "artist_id": show.artist_id,
+      "artist_name": show.artist.name,
+      "artist_image_link": show.artist.image_link,
+      "start_time": format_datetime(str(show.start_time))
+    }
+    if show.start_time > current_time:
+      upcoming_shows.append(data)
+    else:
+      past_shows.append(data)
+
+  data = {
+    "id": artist.id,
+    "name": artist.name,
+    "genres": artist.genres,
+    "city": artist.city,
+    "state": artist.state,
+    "phone": artist.phone,
+    "website": artist.website,
+    "facebook_link": artist.facebook_link,
+    "seeking_venue": artist.seeking_venue,
+    "seeking_description": artist.seeking_description,
+    "image_link": artist.image_link,
+    "upcoming_shows": upcoming_shows,
+    "past_shows": past_shows
+  }
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update
@@ -430,18 +459,32 @@ def create_artist_submission():
   
   except:
     db.session.rollback()
-    flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    flash('An error occurred``. Artist ' + request.form['name'] + ' could not be listed.')
 
   finally:
     db.session.close()
   
   return render_template('pages/home.html')
 
-@app.route('/artist/delete/<artist_id>', methods=['DELETE'])
+@app.route('/artist/<artist_id>', methods=['DELETE'])
 def delete_artist(artist_id):
-  print('placeholder')
-  # add code here
+  try:
+    artist = Artist.query.get(artist_id)
+    artist_name = artist.name
+
+    db.session.delete(artist)
+    db.session.commit()
+
+    flash('Artist ' + artist_name + ' was deleted')
   
+  except:
+    db.session.rollback()
+    flash('An error occured, Artist ' + artist_name + ' was not deleted')
+  
+  finally:
+    db.session.close()
+
+  return redirect(url_for('index'))
 #  Shows
 #  ----------------------------------------------------------------
 
