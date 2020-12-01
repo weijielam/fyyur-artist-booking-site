@@ -47,6 +47,13 @@
 	</div>
 </div>
 <section>
+	<button id="edit_venue" onclick="editVenue(event)" class="btn btn-primary btn-lg"
+	  data-id="{{ venue.id }}">Edit</button>
+	<button id="delete_venue" onclick="deleteVenue(event)" class="btn btn-primary btn-lg"
+	  data-id="{{ venue.id }}">Delete</button>
+  </section>
+<section>
+<section>
 	<h2 class="monospace">{{ venue.upcoming_shows_count }} Upcoming {% if venue.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
 	<div class="row">
 		{%for show in venue.upcoming_shows %}
@@ -74,6 +81,35 @@
 		{% endfor %}
 	</div>
 </section>
+<script>
+	function deleteVenue(e) {
+	  const id = e.target.dataset.id
+	  fetch(`/venues/${id}`, {
+		method: 'DELETE'
+	  })
+		.then(response => {
+		  window.location.href = response.url;
+		})
+		.catch(error => {
+		  console.log(error);
+		})
+	}
+  
+	function editVenue(e) {
+	  const id = e.target.dataset.id
+  
+	  fetch(`/venues/${id}/edit`, {
+		method: 'GET'
+	  })
+		.then(response => {
+		  window.location.href = `/venues/${id}/edit`;
+		})
+		.catch(error => {
+		  console.log(error);
+		})
+	}
+  </script>
+  
 
 {% endblock %}
 
