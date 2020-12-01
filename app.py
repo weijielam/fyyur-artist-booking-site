@@ -103,13 +103,12 @@ def venues():
   data = []
   venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
   venue_city_and_state = ''
+  current_date = datetime.now()
 
   for venue in venues:
-    num_upcoming_shows = 0
-    current_date = datetime.now()
-    print(venue.id)
-  
     shows = Show.query.filter_by(venue_id=venue.id).all()
+    num_upcoming_shows = 0
+  
     for show in shows:
       if show.start_time > current_date:
         num_upcoming_shows += 1
@@ -138,10 +137,11 @@ def venues():
 def search_venues():
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
+  
+  data = []
   current_date = datetime.now()
   num_upcoming_shows = 0
-  data = []
-
+  
   for result in search_result:
     shows = Show.query.filter_by(venue_id=result.id).all()
     
@@ -474,10 +474,10 @@ def delete_artist(artist_id):
 
     db.session.delete(artist)
     db.session.commit()
-
     flash('Artist ' + artist_name + ' was deleted')
   
   except:
+    print(sys.exc_info())
     db.session.rollback()
     flash('An error occured, Artist ' + artist_name + ' was not deleted')
   
