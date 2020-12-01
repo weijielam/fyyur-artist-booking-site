@@ -44,7 +44,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(250))
-    shows = db.relationship('Show', backref='venue', lazy=True)
+    shows = db.relationship('Show', backref='venue', lazy=True, cascade="save-update, merge, delete")
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -61,7 +61,7 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(120))
 
-    shows = db.relationship('Show', backref='artist', lazy=True)
+    shows = db.relationship('Show', backref='artist', lazy=True, cascade="save-update, merge, delete")
 
 class Show(db.Model):
     __tablename__ = 'Show'
@@ -69,7 +69,6 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
-    description = db.Column(db.String(120))
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.now())
     
 #----------------------------------------------------------------------------#
@@ -247,7 +246,9 @@ def delete_venue(venue_id):
     flash('Venue' + venue_name + ' was deleted')
   
   except:
+    print(sys.exc_info)
     flash('An error occured and Venue ' + venue_name + ' was not deleted')
+
     db.session.rollback()
   
   finally:
@@ -517,7 +518,6 @@ def create_show_submission():
     new_show = Show(
       artist_id = request.form['artist_id'],
       venue_id = request.form['venue_id'],
-      description = "placeholder",
       start_time = request.form['start_time']
     )
 
