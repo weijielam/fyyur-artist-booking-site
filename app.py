@@ -102,14 +102,14 @@ def venues():
   data = []
   venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
   venue_city_and_state = ''
-  current_date = datetime.now()
+  current_time = datetime.now()
 
   for venue in venues:
     shows = Show.query.filter_by(venue_id=venue.id).all()
     num_upcoming_shows = 0
   
     for show in shows:
-      if show.start_time > current_date:
+      if show.start_time > current_time:
         num_upcoming_shows += 1
     
     if venue_city_and_state == venue.city + venue.state:
@@ -138,14 +138,14 @@ def search_venues():
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
   
   data = []
-  current_date = datetime.now()
+  current_time = datetime.now()
   num_upcoming_shows = 0
   
   for result in search_result:
     shows = Show.query.filter_by(venue_id=result.id).all()
     
     for show in shows:
-      if show.start_time > current_date:
+      if show.start_time > current_time:
         num_upcoming_shows += 1
     
     data.append({
@@ -164,7 +164,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   venue = Venue.query.get(venue_id)
-  shows = Show.query.filter_by(venue_id=venue.id).all()
+  shows = venue.shows
   past_shows = []
   upcoming_shows = []
   current_time = datetime.now()
@@ -257,7 +257,7 @@ def delete_venue(venue_id):
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return redirect(url_for('index'))
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -283,7 +283,7 @@ def search_artists():
     data.append({
       "id": result.id,
       "name": result.name,
-      "num_upcoming_shows": 1
+      "num_upcoming_shows": 1 # TODO: FIX THIS
     })
   
   response={
@@ -295,27 +295,24 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
-
   artist = Artist.query.get(artist_id)
+  shows = artist.shows
+
   upcoming_shows = []
   past_shows = []
   current_time = datetime.now()
 
-  shows = Show.query.filter_by(artist_id=artist.id).all()
-
   for show in shows:
-    data = {
+    show_info = {
       "artist_id": show.artist_id,
       "artist_name": show.artist.name,
       "artist_image_link": show.artist.image_link,
       "start_time": format_datetime(str(show.start_time))
     }
     if show.start_time > current_time:
-      upcoming_shows.append(data)
+      upcoming_shows.append(show_info)
     else:
-      past_shows.append(data)
+      past_shows.append(show_info)
 
   data = {
     "id": artist.id,
@@ -339,7 +336,6 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  # TODO: populate form with fields from artist with ID <artist_id>
 
   artist = Artist.query.get(artist_id)
 
@@ -375,7 +371,7 @@ def edit_artist_submission(artist_id):
     db.session.commit()
     flash('The Artist ' + request.form['name'] + ' has been successfully updated!')
   except:
-    db.session.rolback()
+    db.session.rollback()
     flash('An Error has occured and the update unsuccessful')
   finally:
     db.session.close()
@@ -410,9 +406,8 @@ def edit_venue_submission(venue_id):
   try:
     form = VenueForm()
     venue = Venue.query.get(venue_id)
-    name = form.name.data
 
-    venue.name = name
+    venue.name = form.name.data
     venue.genres = form.genres.data
     venue.city = form.city.data
     venue.state = form.state.data
@@ -478,7 +473,6 @@ def delete_artist(artist_id):
     flash('Artist ' + artist_name + ' was deleted')
   
   except:
-    print(sys.exc_info())
     db.session.rollback()
     flash('An error occured, Artist ' + artist_name + ' was not deleted')
   
