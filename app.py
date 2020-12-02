@@ -352,7 +352,10 @@ def edit_artist_submission(artist_id):
     artist.city = form.city.data
     artist.genres = form.genres.data
     artist.image_link = form.image_link.data
+    artist.website = form.website.data
     artist.facebook_link = form.facebook_link.data
+    artist.seeking_description = form.seeking_description.data
+    artist.seeking_venue = form.seeking_venue.data
     
     db.session.commit()
     flash('The Artist ' + request.form['name'] + ' has been successfully updated!')
@@ -386,7 +389,7 @@ def edit_venue_submission(venue_id):
     venue.website = form.website.data
     venue.facebook_link = form.facebook_link.data
     venue.image_link = form.image_link.data
-    venue.seeking_talent = form.seeking_talent.data
+    venue.seeking_talent = form.seeking_venue.data
     venue.seeking_description = form.seeking_description.data
 
     db.session.commit()
@@ -418,7 +421,7 @@ def create_artist_submission():
       website= request.form['website'],
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
-      seeking_talent = request.form['seeking_talent'],
+      seeking_venue = bool(request.form['seeking_venue']),
       seeking_description = request.form['seeking_description']
     )
 
@@ -427,8 +430,9 @@ def create_artist_submission():
     flash('Artist ' + request.form['name'] + ' was successfully listed!')
   
   except:
+    print(sys.exc_info())
     db.session.rollback()
-    flash('An error occurred``. Artist ' + request.form['name'] + ' could not be listed.')
+    flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
 
   finally:
     db.session.close()
