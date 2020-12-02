@@ -39,9 +39,9 @@ class Venue(db.Model):
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     genres = db.Column("genres", db.ARRAY(db.String()), nullable=False)
+    website = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default=False, nullable=False)
     seeking_description = db.Column(db.String(250))
     shows = db.relationship('Show', backref='venue', lazy=True, cascade="save-update, merge, delete")
@@ -192,7 +192,7 @@ def show_venue(venue_id):
     "website": venue.website,
     "facebook_link": venue.facebook_link,
     "seeking_talent": venue.seeking_talent,
-    "seeking_description":venue.seeking_description,
+    "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
     "past_shows": past_shows,
     "upcoming_shows": upcoming_shows,
@@ -213,20 +213,26 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   try:
+
+    print(type(request.form['seeking_talent']))
     new_venue = Venue(
       name = request.form['name'],
       city = request.form['city'],
       state = request.form['state'],
       address = request.form['address'],
-      phone = request.form['name'],
-      genres= request.form.getlist('genres'),
+      phone  = request.form['name'],
+      genres = request.form.getlist('genres'),
+      website = request.form['website'],
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
+      seeking_talent = bool(request.form['seeking_talent']),
+      seeking_description = request.form['seeking_description']
     )
     db.session.add(new_venue)
     db.session.commit()
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
   except:
+    print(sys.exc_info())
     db.session.rollback()
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   finally:
@@ -370,19 +376,19 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
   try:
     form = VenueForm()
-
     venue = Venue.query.get(venue_id)
+
     venue.name = form.name.data
     venue.city = form.city.data
     venue.state = form.state.data
     venue.address = form.address.data
     venue.genres = form.genres.data
     venue.phone = form.phone.data
+    venue.website = form.website.data
     venue.facebook_link = form.facebook_link.data
-    # venue.website = form.website.data
     venue.image_link = form.image_link.data
-    # venue.seeking_talent = form.seeking_talent.data
-    # venue.seeking_description = form.seeking_description.data
+    venue.seeking_talent = form.seeking_talent.data
+    venue.seeking_description = form.seeking_description.data
 
     db.session.commit()
     flash('Venue ' + venue.name + ' has been updated')
@@ -410,8 +416,11 @@ def create_artist_submission():
       state = request.form['state'],
       phone = request.form['name'],
       genres= request.form.getlist('genres'),
+      website= request.form['website'],
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
+      seeking_talent = request.form['seeking_talent'],
+      seeking_description = request.form['seeking_description']
     )
 
     db.session.add(new_artist)

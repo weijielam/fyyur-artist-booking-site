@@ -106,6 +106,9 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
+    website = StringField(
+        'website'
+    )
     phone = StringField(
         'phone'
     )
@@ -116,7 +119,6 @@ class VenueForm(Form):
         # TODO implement enum restriction
         'genres', validators=[DataRequired()],
         choices=genres_choices
-        
     )
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
