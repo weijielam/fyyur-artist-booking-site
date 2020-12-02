@@ -213,7 +213,6 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
   try:
-
     print(type(request.form['seeking_talent']))
     new_venue = Venue(
       name = request.form['name'],
