@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'Venues'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -47,7 +47,7 @@ class Venue(db.Model):
     shows = db.relationship('Show', backref='venue', lazy=True, cascade="save-update, merge, delete")
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'Artists'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -64,7 +64,7 @@ class Artist(db.Model):
     shows = db.relationship('Show', backref='artist', lazy=True, cascade="save-update, merge, delete")
 
 class Show(db.Model):
-    __tablename__ = 'Show'
+    __tablename__ = 'Shows'
 
     id = db.Column(db.Integer, primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
@@ -356,12 +356,12 @@ def edit_artist_submission(artist_id):
     artist.facebook_link = form.facebook_link.data
     artist.seeking_description = form.seeking_description.data
     artist.seeking_venue = form.seeking_venue.data
-    
+
     db.session.commit()
     flash('The Artist ' + request.form['name'] + ' has been successfully updated!')
   except:
     db.session.rollback()
-    flash('An Error has occured and the update unsuccessful')
+    flash('An error has occured and the update unsuccessful')
   finally:
     db.session.close()
 
