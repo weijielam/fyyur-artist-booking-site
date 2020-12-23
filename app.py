@@ -136,7 +136,7 @@ def venues():
 def search_venues():
   search_term = request.form.get('search_term', '')
   search_result = db.session.query(Venue).filter(Venue.name.ilike(f'%{search_term}%')).all()
-  
+  print(search_result.join(Show.venue_id))
   data = []
   current_time = datetime.now()
   num_upcoming_shows = 0
@@ -165,10 +165,13 @@ def search_venues():
 def show_venue(venue_id):
   venue = Venue.query.get(venue_id)
   shows = venue.shows
+  print(shows)
   past_shows = []
   upcoming_shows = []
   current_time = datetime.now()
 
+  shows = db.session.query(Show).join(Artist).filter(Show.venue_id == venue_id).all()
+  print(shows)
   for show in shows:
     show_data = {
       "artist_id": show.artist_id,
