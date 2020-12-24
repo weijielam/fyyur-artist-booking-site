@@ -164,13 +164,11 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   venue = Venue.query.get(venue_id)
-  shows = venue.shows
-  print(shows)
+  shows = db.session.query(Show).join(Venue).filter(Show.venue_id == venue_id).all()
   past_shows = []
   upcoming_shows = []
   current_time = datetime.now()
 
-  shows = db.session.query(Show).join(Artist).filter(Show.venue_id == venue_id).all()
   print(shows)
   for show in shows:
     show_data = {
@@ -227,8 +225,8 @@ def create_venue_submission():
       website = request.form['website'],
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
-      seeking_talent = bool(request.form['seeking_talent']),
-      seeking_description = request.form['seeking_description']
+      seeking_talent = request.form['seeking_talent'] == "True",
+      seeking_description = request.form['seeking_description'] 
     )
     db.session.add(new_venue)
     db.session.commit()
@@ -300,12 +298,13 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   artist = Artist.query.get(artist_id)
-  shows = artist.shows
+  shows = db.session.query(Show).join(Artist).filter(Show.artist_id == artist_id).all()
 
   upcoming_shows = []
   past_shows = []
   current_time = datetime.now()
-
+  
+  
   for show in shows:
     show_info = {
       "artist_id": show.artist_id,
@@ -357,8 +356,8 @@ def edit_artist_submission(artist_id):
     artist.image_link = form.image_link.data
     artist.website = form.website.data
     artist.facebook_link = form.facebook_link.data
-    artist.seeking_description = form.seeking_description.data
-    artist.seeking_venue = form.seeking_venue.data
+    artist.seeking_description = form.seeking_description.data 
+    artist.seeking_venue = form.seeking_venue.data == "True"
 
     db.session.commit()
     flash('The Artist ' + request.form['name'] + ' has been successfully updated!')
@@ -392,7 +391,7 @@ def edit_venue_submission(venue_id):
     venue.website = form.website.data
     venue.facebook_link = form.facebook_link.data
     venue.image_link = form.image_link.data
-    venue.seeking_talent = form.seeking_venue.data
+    venue.seeking_venue = form.seeking_venue.data == "True"
     venue.seeking_description = form.seeking_description.data
 
     db.session.commit()
@@ -424,7 +423,7 @@ def create_artist_submission():
       website= request.form['website'],
       image_link = request.form['image_link'],
       facebook_link = request.form['facebook_link'],
-      seeking_venue = bool(request.form['seeking_venue']),
+      seeking_venue = request.form['seeking_venue'] == "True",
       seeking_description = request.form['seeking_description']
     )
 
