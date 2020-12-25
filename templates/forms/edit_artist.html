@@ -29,12 +29,24 @@
       {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', id=form.genres.id, autofocus = true, value = artist.genres) }}
     </div>
     <div class="form-group">
-      <label for="genres">Image Link</label>
-      {{ form.image_link(class_ = 'form-control', placeholder=artist.image_link, id=form.image_link.id, autofocus = true, value = artist.image_link) }}
+      <label for="website">Website</label>
+      {{ form.website(class_ = 'form-control', placeholder='http://', id=form.website.id, autofocus = true, value = artist.website) }}
     </div>
     <div class="form-group">
-      <label for="genres">Facebook Link</label>
-      {{ form.facebook_link(class_ = 'form-control', placeholder='http://', id=form.facebook_link.id, autofocus = true, value = artist.facebook_link) }}
+        <label for="facebook_link">Facebook Link</label>
+        {{ form.facebook_link(class_ = 'form-control', placeholder='http://', id=form.facebook_link.id, autofocus = true, value = artist.facebook_link) }}
+      </div>
+    <div class="form-group">
+      <label for="image_link">Image Link</label>
+      {{ form.image_link(class_ = 'form-control', placeholder='http://', id=form.image_link.id, autofocus = true, value = artist.image_link) }}
+    </div>
+    <div class="form-group">
+      <label for="seeking_venue">Looking for Talent</label>
+      {{ form.seeking_venue(class_ = 'form-control', placeholder='Venue', id=form.seeking_venue.id ,autofocus = true, value = artist.seeking_venue) }}
+    </div>
+    <div class="form-group">
+      <label for="seeking_description">Seeking Description</label>
+      {{ form.seeking_description(class_ = 'form-control', autofocus = true, id=form.seeking_description.id, value = artist.seeking_description) }}
     </div>
     <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
   </form>
