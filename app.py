@@ -418,7 +418,7 @@ def create_artist_submission():
       name = request.form['name'],
       city = request.form['city'],
       state = request.form['state'],
-      phone = request.form['name'],
+      phone = request.form['phone'],
       genres= request.form.getlist('genres'),
       website= request.form['website'],
       image_link = request.form['image_link'],
